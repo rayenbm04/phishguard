@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
+          # Same version as the team's PCs (flutter --version). Upgrade it on purpose, all together.
+          flutter-version: 3.47.9
           channel: stable
           cache: true
       - run: flutter pub get
