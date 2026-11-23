@@ -1,8 +1,7 @@
 # Serveur PhishGuard
 
-API FastAPI (Python 3.10 ou plus, 3.12 en CI). Étape 3 : `/analyse` lance le vrai pipeline
-(diagrammes SD2 et SD3). Les explications sont encore des phrases modèles en anglais ;
-l'IA (LLMExplainer) arrive à l'étape 4.
+API FastAPI (Python 3.10 ou plus, 3.12 en CI). `/analyse` lance le pipeline des diagrammes
+SD2 et SD3 ; depuis l'étape 4, l'IA rédige l'explication dans la langue du message.
 
 ## Lancer en local (PowerShell)
 
@@ -22,6 +21,7 @@ Puis ouvrir http://127.0.0.1:8000/docs pour tester `/health`, `/analyse` et `/fe
 | --- | --- | --- |
 | `GOOGLE_SAFE_BROWSING_API_KEY` | Google Cloud Console → activer « Safe Browsing API » → Identifiants → Clé API | le contrôle échoue → verdict au mieux `UNSURE` |
 | `VIRUSTOTAL_API_KEY` | virustotal.com → profil → API Key (gratuit, 4 requêtes/min) | idem |
+| `LLM_API_KEY` | Gemini : aistudio.google.com → Get API key (gratuit). Ou une clé Anthropic / OpenAI avec `LLM_PROVIDER` | explication en phrases modèles (anglais), verdict identique |
 
 RDAP (âge des domaines) ne demande pas de clé. Les domaines `.tn` n'ont pas de RDAP public.
 
@@ -31,18 +31,27 @@ RDAP (âge des domaines) ne demande pas de clé. Les domaines `.tn` n'ont pas de
 
 1. `InjectionGuard` retire les instructions cachées destinées à l'IA et les garde comme preuve.
 2. `ClueExtractor` trouve les liens, montants, numéros, expéditeurs et mots urgents.
-3. En parallèle (6,5 s max) :
+3. `KnownScamMatcher` compare avec les campagnes connues (`data/known_scams.json`) et
+   `TextHeuristicCheck` cherche les signes dans les mots (code secret demandé, frais à payer,
+   menace de blocage, cadeau, « j'ai changé de numéro », urgence).
+4. En parallèle (5 s max) :
    - `LinkReputationCheck` : Google Safe Browsing, puis VirusTotal seulement si le lien n'est pas
      listé ; résultats gardés 6 h dans `ReputationCache` ;
    - `DomainCheck` : âge du domaine (RDAP), imitation d'une marque tunisienne, extension risquée,
      lien raccourci, adresse IP.
-4. `SafetyRules` décide (jamais l'IA) :
+5. `SafetyRules` décide (jamais l'IA) :
    - lien sur liste noire → `FRAUDULENT` ;
    - imitation d'une marque sur un site neuf ou risqué → `FRAUDULENT` ;
    - sinon le score de risque décide (≥ 70 `FRAUDULENT`, ≥ 35 `SUSPICIOUS`) ;
+   - des instructions cachées pour l'IA → au moins `SUSPICIOUS` ;
    - un contrôle `FAILED` ne donne jamais `SAFE` → `UNSURE` ;
-   - un message sans lien → `UNSURE` (l'analyse du texte arrive à l'étape 4).
-5. `TemplateExplainer` écrit le résumé, les 3 raisons principales et les conseils.
+   - un message sans lien n'est `SAFE` que s'il ne montre aucun signe et ne demande ni appel
+     ni paiement ; sinon `UNSURE`.
+6. `LLMExplainer` rédige le résumé, les 3 raisons et les conseils dans la langue du message.
+   Il ne peut que reformuler : chaque raison doit citer une preuve, chaque contact vient de
+   `OfficialContactDirectory`, les liens écrits par l'IA sont supprimés, le texte du message
+   lui est donné comme donnée non fiable. Si l'IA échoue ou dépasse le temps restant (le tout
+   tient en 7,3 s), `TemplateExplainer` répond en phrases modèles.
 
 ## Tests et style
 

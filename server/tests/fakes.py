@@ -15,7 +15,9 @@ class FakeWeb:
     listed: set[str] = field(default_factory=set)  # Hosts Safe Browsing flags.
     vt_malicious: dict[str, int] = field(default_factory=dict)  # Host -> engines flagging it.
     created: dict[str, str] = field(default_factory=dict)  # Domain -> ISO registration date.
-    fail: set[str] = field(default_factory=set)  # "safebrowsing", "virustotal", "rdap".
+    fail: set[str] = field(default_factory=set)  # "safebrowsing", "virustotal", "rdap", "llm".
+    llm_reply: dict | str | None = None  # What the fake AI answers (dict = JSON object).
+    llm_prompts: list[str] = field(default_factory=list)
     calls: list[str] = field(default_factory=list)
 
     def handler(self, request: httpx.Request) -> httpx.Response:
@@ -50,13 +52,25 @@ class FakeWeb:
                 return httpx.Response(404)
             events = [{"eventAction": "registration", "eventDate": self.created[domain]}]
             return httpx.Response(200, json={"events": events})
+        if "generativelanguage" in host:
+            self.calls.append("llm")
+            self.llm_prompts.append(request.content.decode())
+            if "llm" in self.fail or self.llm_reply is None:
+                return httpx.Response(503)
+            reply = (
+                self.llm_reply if isinstance(self.llm_reply, str) else json.dumps(self.llm_reply)
+            )
+            body = {"candidates": [{"content": {"parts": [{"text": reply}]}}]}
+            return httpx.Response(200, json=body)
         return httpx.Response(500)
 
 
-def pipeline(web: FakeWeb, keys: bool = True) -> AnalysisPipeline:
+def pipeline(web: FakeWeb, keys: bool = True, llm: bool = False) -> AnalysisPipeline:
     settings = Settings(
         safe_browsing_key="test" if keys else "",
         virustotal_key="test" if keys else "",
+        llm_provider="gemini",
+        llm_api_key="test" if llm else "",
     )
     http = httpx.AsyncClient(transport=httpx.MockTransport(web.handler))
     return AnalysisPipeline(settings, http)

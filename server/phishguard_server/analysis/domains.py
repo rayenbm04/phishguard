@@ -36,7 +36,7 @@ TUNISIAN_BRANDS = [
     Brand("Tunisie Telecom", ("tunisietelecom.tn",), ("tunisietelecom", "tunisie-telecom")),
     Brand("BIAT", ("biat.com.tn",), ("biat",)),
     Brand("STB", ("stb.com.tn",), ("stb",)),
-    Brand("BH Bank", ("bh.com.tn",), ("bhbank", "bh-bank")),
+    Brand("BH Bank", ("bhbank.tn", "bh.com.tn"), ("bhbank", "bh-bank")),
     Brand("Attijari Bank", ("attijaribank.com.tn",), ("attijari",)),
     Brand("Amen Bank", ("amenbank.com.tn",), ("amenbank", "amen-bank")),
     Brand("UBCI", ("ubci.tn",), ("ubci",)),

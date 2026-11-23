@@ -76,10 +76,15 @@ def test_failed_check_does_not_hide_proof_of_fraud():
     assert verdict.level == VerdictLevel.FRAUDULENT
 
 
-def test_message_without_link_is_unsure():
+def test_harmless_message_without_link_is_safe():
     verdict = run(FakeWeb(), "Bonjour, on se voit demain ?")
-    assert verdict.level == VerdictLevel.UNSURE
+    assert verdict.level == VerdictLevel.SAFE
     assert verdict.reasons
+
+
+def test_message_asking_to_call_without_other_sign_is_unsure():
+    verdict = run(FakeWeb(), "Bonjour, merci de rappeler le [PHONE] demain.")
+    assert verdict.level == VerdictLevel.UNSURE
 
 
 def test_prompt_injection_is_removed_and_reported():
