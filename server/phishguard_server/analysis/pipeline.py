@@ -24,7 +24,8 @@ from .llm import LLMClient
 from .rules import SafetyRules
 from .text_heuristics import TextHeuristicCheck
 
-log = logging.getLogger("phishguard.pipeline")
+# uvicorn prints this logger in the server console.
+log = logging.getLogger("uvicorn.error")
 
 
 class AnalysisPipeline:
@@ -76,7 +77,7 @@ class AnalysisPipeline:
             timeout=time_left,
         )
         if self.explainer.last_error:
-            log.info("AI explanation not used: %s", self.explainer.last_error)
+            log.warning("AI explanation not used: %s", self.explainer.last_error)
         return Verdict(
             id=str(uuid4()),
             level=decision.level,
