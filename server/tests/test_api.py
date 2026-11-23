@@ -3,8 +3,12 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from phishguard_server.main import app
+from phishguard_server.main import app, get_pipeline
 
+from .fakes import FakeWeb, pipeline
+
+web = FakeWeb(listed={"amende-tn.info"})
+app.dependency_overrides[get_pipeline] = lambda: pipeline(web)
 client = TestClient(app)
 CONTRACTS = Path(__file__).resolve().parents[2] / "contracts"
 
@@ -15,13 +19,14 @@ def test_health():
     assert response.json()["status"] == "ok"
 
 
-def test_analyse_returns_unsure_placeholder():
+def test_analyse_example_request():
     body = json.loads((CONTRACTS / "analyse_request.example.json").read_text(encoding="utf-8"))
     response = client.post("/analyse", json=body)
     assert response.status_code == 200
     verdict = response.json()
-    assert verdict["level"] == "UNSURE"
-    assert "riskScore" in verdict and verdict["reasons"]
+    assert verdict["level"] == "FRAUDULENT"
+    assert verdict["reasons"][0]["evidenceSource"] == "Google Safe Browsing"
+    assert {"riskScore", "checkedAt", "advice"} <= verdict.keys()
 
 
 def test_analyse_rejects_empty_message():

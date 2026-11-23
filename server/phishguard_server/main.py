@@ -1,14 +1,30 @@
-"""FastAPI entry point. Step 1: the contract is real, the analysis is a placeholder."""
+"""FastAPI entry point. Step 3: /analyse runs the real pipeline (SD2/SD3)."""
 
-from datetime import datetime, timezone
-from uuid import uuid4
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+import httpx
+from fastapi import Depends, FastAPI, Request
 
 from . import __version__
-from .models import Advice, AnalyseRequest, Feedback, Reason, Verdict, VerdictLevel
+from .analysis import AnalysisPipeline
+from .config import Settings
+from .models import AnalyseRequest, Feedback, Verdict
 
-app = FastAPI(title="PhishGuard API", version=__version__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    settings = Settings.load()
+    async with httpx.AsyncClient(timeout=settings.http_timeout) as http:
+        app.state.pipeline = AnalysisPipeline(settings, http)
+        yield
+
+
+app = FastAPI(title="PhishGuard API", version=__version__, lifespan=lifespan)
+
+
+def get_pipeline(request: Request) -> AnalysisPipeline:
+    return request.app.state.pipeline
 
 
 @app.get("/health")
@@ -17,23 +33,10 @@ def health() -> dict[str, str]:
 
 
 @app.post("/analyse", response_model=Verdict, response_model_by_alias=True)
-def analyse(request: AnalyseRequest) -> Verdict:
-    # Placeholder until the pipeline (step 3): never answer SAFE without evidence.
-    return Verdict(
-        id=str(uuid4()),
-        level=VerdictLevel.UNSURE,
-        risk_score=50,
-        summary="The analysis is not available yet.",
-        checked_at=datetime.now(timezone.utc),
-        reasons=[
-            Reason(
-                rank=1,
-                text="No check has been run on this message yet.",
-                evidence_source="PhishGuard",
-            )
-        ],
-        advice=[Advice(action="Do not open the link until the check is available.")],
-    )
+async def analyse(
+    request: AnalyseRequest, pipeline: AnalysisPipeline = Depends(get_pipeline)
+) -> Verdict:
+    return await pipeline.run(request)
 
 
 @app.post("/feedback", status_code=201)
