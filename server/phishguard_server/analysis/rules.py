@@ -5,7 +5,8 @@
 3. Hidden instructions for the AI make a message at least SUSPICIOUS.
 4. Otherwise the risk score (sum of weights) decides.
 5. A FAILED check can never give SAFE: the answer becomes UNSURE.
-6. A message without anything checkable is UNSURE, not SAFE.
+6. A message without a link is SAFE only when its words show no warning sign at all
+   and it asks for no call or payment; otherwise it is UNSURE.
 """
 
 from dataclasses import dataclass
@@ -24,7 +25,9 @@ class Decision:
 
 
 class SafetyRules:
-    def decide(self, evidence: list[Evidence], has_links: bool) -> Decision:
+    def decide(
+        self, evidence: list[Evidence], has_links: bool, asks_call_or_money: bool = False
+    ) -> Decision:
         kinds = {e.kind for e in evidence if e.status == CheckStatus.OK}
         score = min(100, sum(e.weight for e in evidence if e.status == CheckStatus.OK))
         failed = any(e.status == CheckStatus.FAILED for e in evidence)
@@ -37,6 +40,8 @@ class SafetyRules:
             return Decision(VerdictLevel.FRAUDULENT, score)
         if score >= SUSPICIOUS_SCORE or "prompt_injection" in kinds:
             return Decision(VerdictLevel.SUSPICIOUS, max(score, SUSPICIOUS_SCORE))
-        if failed or not has_links:
+        if failed:
+            return Decision(VerdictLevel.UNSURE, max(score, 40))
+        if not has_links and (score > 0 or asks_call_or_money):
             return Decision(VerdictLevel.UNSURE, max(score, 40))
         return Decision(VerdictLevel.SAFE, min(score, 20))

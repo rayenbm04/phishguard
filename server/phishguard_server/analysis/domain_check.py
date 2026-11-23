@@ -42,9 +42,18 @@ class DomainCheck:
     def _static(self, host: str, domain: str) -> list[Evidence]:
         found: list[Evidence] = []
 
-        def add(kind: str, text: str, detail: str, weight: int) -> None:
+        def add(kind: str, text: str, detail: str, weight: int, brand: str | None = None) -> None:
             found.append(
-                Evidence("PhishGuard", kind, CheckStatus.OK, Signal.WARNING, text, detail, weight)
+                Evidence(
+                    "PhishGuard",
+                    kind,
+                    CheckStatus.OK,
+                    Signal.WARNING,
+                    text,
+                    detail,
+                    weight,
+                    brand=brand,
+                )
             )
 
         brand = lookalike_brand(host)
@@ -54,6 +63,7 @@ class DomainCheck:
                 f"The link imitates {brand.name} but is not its official site.",
                 f"{host} is not {', '.join(brand.official)}",
                 45,
+                brand.name,
             )
         if is_ip(host):
             add("ip_address", "The link uses a bare IP address instead of a name.", host, 30)

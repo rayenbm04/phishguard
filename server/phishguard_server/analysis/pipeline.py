@@ -1,6 +1,8 @@
-"""AnalysisPipeline (SD2): guard -> clues -> checks in parallel -> rules -> explanation."""
+"""AnalysisPipeline (SD2): guard -> clues -> checks -> rules -> AI explanation."""
 
 import asyncio
+import logging
+import time
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -11,31 +13,19 @@ from ..models import AnalyseRequest, Verdict
 from .cache import ReputationCache
 from .clients import RdapClient, SafeBrowsingClient, VirusTotalClient
 from .clues import ClueExtractor, Clues, ClueType
+from .contacts import OfficialContactDirectory
 from .domain_check import DomainCheck
-from .evidence import CheckStatus, Evidence, Signal
-from .explainer import TemplateExplainer
+from .evidence import Evidence
+from .explainer import LLMExplainer
 from .injection_guard import InjectionGuard
+from .known_scams import KnownScamMatcher
 from .link_reputation import LinkReputationCheck
+from .llm import LLMClient
 from .rules import SafetyRules
+from .text_heuristics import TextHeuristicCheck
 
-
-def _pressure(clues: Clues) -> list[Evidence]:
-    """Urgency plus money or a link: the usual shape of a scam (text checks grow in step 4)."""
-    urgent = clues.of(ClueType.URGENT_WORD)
-    asks = clues.of(ClueType.AMOUNT) or clues.links
-    if not (urgent and asks):
-        return []
-    return [
-        Evidence(
-            source="PhishGuard",
-            kind="pressure",
-            status=CheckStatus.OK,
-            signal=Signal.WARNING,
-            text="The message rushes you to pay or click.",
-            detail="Urgent words: " + ", ".join(f'"{w}"' for w in urgent[:3]),
-            weight=15,
-        )
-    ]
+# uvicorn prints this logger in the server console.
+log = logging.getLogger("uvicorn.error")
 
 
 class AnalysisPipeline:
@@ -49,10 +39,16 @@ class AnalysisPipeline:
             ReputationCache(),
         )
         self.domains = DomainCheck(RdapClient(http))
+        self.known_scams = KnownScamMatcher()
+        self.text_check = TextHeuristicCheck()
         self.rules = SafetyRules()
-        self.explainer = TemplateExplainer()
+        self.contacts = OfficialContactDirectory()
+        self.explainer = LLMExplainer(
+            LLMClient(http, settings.llm_provider, settings.llm_api_key, settings.llm_model)
+        )
 
     async def run(self, request: AnalyseRequest) -> Verdict:
+        started = time.monotonic()
         text = request.message.text
         evidence: list[Evidence] = []
 
@@ -62,11 +58,26 @@ class AnalysisPipeline:
             evidence.append(self.guard.evidence(found))
 
         clues = self.extractor.extract(text, request.source_app)
-        evidence += _pressure(clues)
-        evidence += await self._run_checks(clues)
+        evidence += self.known_scams.run(text)
+        evidence += self.text_check.run(text, clues)
+        evidence += await self._network_checks(clues)
 
-        decision = self.rules.decide(evidence, has_links=bool(clues.links))
-        summary, reasons, advice = self.explainer.explain(decision, evidence, bool(clues.links))
+        has_links = bool(clues.links)
+        asks = bool(clues.of(ClueType.PHONE) or clues.of(ClueType.AMOUNT))
+        decision = self.rules.decide(evidence, has_links, asks)
+
+        time_left = self.settings.total_budget - (time.monotonic() - started)
+        summary, reasons, advice = await self.explainer.explain(
+            decision,
+            evidence,
+            has_links,
+            self.contacts.contacts_for(evidence),
+            text,
+            request.message.language,
+            timeout=time_left,
+        )
+        if self.explainer.last_error:
+            log.warning("AI explanation not used: %s", self.explainer.last_error)
         return Verdict(
             id=str(uuid4()),
             level=decision.level,
@@ -77,7 +88,7 @@ class AnalysisPipeline:
             advice=advice,
         )
 
-    async def _run_checks(self, clues: Clues) -> list[Evidence]:
+    async def _network_checks(self, clues: Clues) -> list[Evidence]:
         if not clues.links:
             return []
         checks = {

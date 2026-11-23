@@ -1,5 +1,6 @@
-"""FastAPI entry point. Step 3: /analyse runs the real pipeline (SD2/SD3)."""
+"""FastAPI entry point. /analyse runs the pipeline (SD2/SD3)."""
 
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -17,6 +18,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = Settings.load()
     async with httpx.AsyncClient(timeout=settings.http_timeout) as http:
         app.state.pipeline = AnalysisPipeline(settings, http)
+        llm = app.state.pipeline.explainer.llm
+        logging.getLogger("uvicorn.error").info(
+            "PhishGuard %s | Safe Browsing key: %s | VirusTotal key: %s | AI: %s (%s), key: %s",
+            __version__,
+            "set" if settings.safe_browsing_key else "MISSING",
+            "set" if settings.virustotal_key else "MISSING",
+            llm.provider,
+            llm.model,
+            "set" if llm.enabled else "MISSING",
+        )
         yield
 
 

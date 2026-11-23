@@ -27,6 +27,7 @@ class Evidence:
     text: str  # One sentence for the user.
     detail: str | None = None  # Technical detail shown when the user taps the reason.
     weight: int = 0  # Points added to the risk score.
+    brand: str | None = None  # The brand a look-alike imitates.
     checked_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     @classmethod

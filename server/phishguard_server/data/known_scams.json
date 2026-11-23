@@ -1,0 +1,82 @@
+[
+  {
+    "id": "fake-parcel-fee",
+    "title": "fake parcel held until you pay a small fee",
+    "ideas": [
+      ["colis", "parcel", "package", "livraison", "delivery", "طرد", "شحنة"],
+      ["bloque", "en attente", "retenu", "held", "on hold", "suspendu", "معلق", "محجوز"],
+      ["frais", "payez", "payer", "fee", "pay", "dt", "tnd", "دفع", "رسوم"]
+    ],
+    "minIdeas": 3
+  },
+  {
+    "id": "fake-traffic-fine",
+    "title": "fake traffic fine to pay online",
+    "ideas": [
+      ["amende", "contravention", "fine", "infraction", "مخالفة", "خطية"],
+      ["payez", "payer", "reglez", "pay", "دفع", "خلاص"],
+      ["24 h", "24h", "48 h", "48h", "majoration", "poursuite", "penalty", "today", "aujourd'hui", "ساعة"]
+    ],
+    "minIdeas": 2
+  },
+  {
+    "id": "fake-bank-account-blocked",
+    "title": "fake bank warning that your account or card is blocked",
+    "ideas": [
+      ["compte", "carte", "account", "card", "حساب", "بطاقة"],
+      ["bloque", "suspendu", "desactive", "blocked", "suspended", "locked", "موقوف", "مجمد"],
+      ["verifiez", "confirmez", "mettez a jour", "verify", "confirm", "update", "code", "تأكيد", "تحديث"]
+    ],
+    "minIdeas": 3
+  },
+  {
+    "id": "fake-refund",
+    "title": "fake refund (CNAM, STEG, taxes) asking for card details",
+    "ideas": [
+      ["remboursement", "rembourse", "refund", "استرجاع", "استرداد"],
+      ["cnam", "steg", "sonede", "impots", "finances", "trop percu", "الضمان", "الستاغ"],
+      ["carte", "card", "rib", "coordonnees", "details", "بطاقة"]
+    ],
+    "minIdeas": 2
+  },
+  {
+    "id": "fake-telecom-prize",
+    "title": "fake operator prize or expiring points",
+    "ideas": [
+      ["ooredoo", "orange", "tunisie telecom", "operateur"],
+      ["gagne", "gagnant", "cadeau", "points", "bonus", "won", "winner", "prize", "gift", "ربحت", "جائزة", "هدية"],
+      ["expire", "dernier jour", "reclamez", "claim", "today", "aujourd'hui", "ينتهي"]
+    ],
+    "minIdeas": 2
+  },
+  {
+    "id": "fake-relative-new-number",
+    "title": "someone pretending to be a relative with a new number",
+    "ideas": [
+      ["maman", "papa", "mom", "dad", "frere", "soeur", "ماما", "بابا", "أمي", "أبي"],
+      ["nouveau numero", "change de numero", "new number", "رقم جديد", "بدلت النومرو", "نومرو جديد"],
+      ["argent", "virement", "envoie", "money", "send", "transfer", "فلوس", "ابعثلي"]
+    ],
+    "minIdeas": 2
+  },
+  {
+    "id": "fake-easy-job",
+    "title": "fake easy job paid for likes or tasks",
+    "ideas": [
+      ["emploi", "travail", "job", "offre", "عمل", "خدمة"],
+      ["par jour", "par heure", "per day", "per hour", "في اليوم", "يوميا"],
+      ["like", "j'aime", "youtube", "tiktok", "taches", "tasks", "telegram", "whatsapp"]
+    ],
+    "minIdeas": 3
+  },
+  {
+    "id": "fake-otp-request",
+    "title": "someone asking you to send back a code you received",
+    "ideas": [
+      ["code", "otp", "رمز", "كود"],
+      ["recu", "envoye", "par sms", "received", "sent you", "وصلك", "جاك"],
+      ["renvoyez", "envoyez", "donnez", "communiquez", "send", "give", "share", "ابعث", "عطيني"]
+    ],
+    "minIdeas": 3
+  }
+]

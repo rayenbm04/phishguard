@@ -24,10 +24,15 @@ def _read_env_file(path: Path) -> dict[str, str]:
 class Settings:
     safe_browsing_key: str = ""
     virustotal_key: str = ""
-    # Each external call stops after this many seconds (the app gives up after 8 s).
+    llm_provider: str = "gemini"  # gemini or groq (free), anthropic or openai
+    llm_api_key: str = ""
+    llm_model: str = ""  # Empty: the provider's default model (see analysis/llm.py).
+    # The app gives up after 8 s, so the server answers within this budget.
+    total_budget: float = 7.3
+    # Each external call stops after this many seconds.
     http_timeout: float = 3.5
-    # The whole set of checks stops after this many seconds.
-    checks_timeout: float = 6.5
+    # Link and domain checks stop after this many seconds; the rest is for the AI.
+    checks_timeout: float = 5.0
 
     @classmethod
     def load(cls, env_file: Path = ENV_FILE) -> "Settings":
@@ -39,4 +44,7 @@ class Settings:
         return cls(
             safe_browsing_key=get("GOOGLE_SAFE_BROWSING_API_KEY"),
             virustotal_key=get("VIRUSTOTAL_API_KEY"),
+            llm_provider=get("LLM_PROVIDER") or "gemini",
+            llm_api_key=get("LLM_API_KEY"),
+            llm_model=get("LLM_MODEL"),
         )
