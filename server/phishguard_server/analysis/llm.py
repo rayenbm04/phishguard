@@ -16,7 +16,8 @@ class LLMError(Exception):
 # "gemini-flash-latest" always points to Google's current Flash model.
 DEFAULT_MODELS = {
     "gemini": "gemini-flash-latest,gemini-flash-lite-latest",
-    "groq": "llama-3.3-70b-versatile",
+    # Groq retired the Llama 3 models in August 2026.
+    "groq": "openai/gpt-oss-120b,openai/gpt-oss-20b",
     "anthropic": "claude-haiku-5-5",
     "openai": "gpt-4.1-mini",
 }
@@ -155,18 +156,20 @@ class LLMClient:
         timeout: float,
         url: str = "https://api.openai.com/v1/chat/completions",
     ) -> httpx.Response:
+        body: dict = {
+            "model": model,
+            "temperature": 0.2,
+            "max_tokens": 700,
+            "response_format": {"type": "json_object"},
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+        }
+        if "gpt-oss" in model:
+            # Reasoning model: think briefly, and leave room for the answer after the thinking.
+            body["reasoning_effort"] = "low"
+            body["max_tokens"] = 2000
         return await self.http.post(
-            url,
-            headers={"Authorization": f"Bearer {self.api_key}"},
-            json={
-                "model": model,
-                "temperature": 0.2,
-                "max_tokens": 700,
-                "response_format": {"type": "json_object"},
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-            },
-            timeout=timeout,
+            url, headers={"Authorization": f"Bearer {self.api_key}"}, json=body, timeout=timeout
         )
