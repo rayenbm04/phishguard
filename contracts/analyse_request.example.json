@@ -1,0 +1,9 @@
+{
+  "message": {
+    "text": "Votre amende de 30 DT doit être payée sous 24 h : https://amende-tn.info/pay",
+    "maskedItems": 1,
+    "language": "fr"
+  },
+  "sourceApp": "com.whatsapp",
+  "appVersion": "0.1.0"
+}

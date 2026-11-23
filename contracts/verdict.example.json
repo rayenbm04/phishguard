@@ -1,0 +1,33 @@
+{
+  "id": "6f1c2a1e-0b8e-4a39-9c51-2d9a7f0c8b11",
+  "level": "FRAUDULENT",
+  "riskScore": 92,
+  "summary": "This message imitates a traffic fine to make you pay on a fake site.",
+  "checkedAt": "2026-11-22T12:00:00Z",
+  "reasons": [
+    {
+      "rank": 1,
+      "text": "The link is listed as phishing.",
+      "evidenceSource": "Google Safe Browsing",
+      "evidenceDetail": "amende-tn.info is flagged as social engineering",
+      "checkedDate": "2026-11-22T12:00:00Z"
+    },
+    {
+      "rank": 2,
+      "text": "The domain was created 6 days ago.",
+      "evidenceSource": "RDAP",
+      "evidenceDetail": null,
+      "checkedDate": null
+    }
+  ],
+  "advice": [
+    {
+      "action": "Do not open the link or pay.",
+      "officialContact": null
+    },
+    {
+      "action": "Report the message to the ANCS.",
+      "officialContact": "https://www.ancs.tn"
+    }
+  ]
+}
