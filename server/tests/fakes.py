@@ -18,6 +18,7 @@ class FakeWeb:
     fail: set[str] = field(default_factory=set)  # "safebrowsing", "virustotal", "rdap", "llm".
     llm_reply: dict | str | None = None  # What the fake AI answers (dict = JSON object).
     llm_prompts: list[str] = field(default_factory=list)
+    busy_models: set[str] = field(default_factory=set)  # Gemini models answering 503.
     calls: list[str] = field(default_factory=list)
 
     def handler(self, request: httpx.Request) -> httpx.Response:
@@ -54,6 +55,9 @@ class FakeWeb:
             return httpx.Response(200, json={"events": events})
         if "generativelanguage" in host:
             self.calls.append("llm")
+            model = request.url.path.split("/models/")[-1].split(":")[0]
+            if model in self.busy_models:
+                return httpx.Response(503, json={"error": {"message": "The model is overloaded."}})
             self.llm_prompts.append(request.content.decode())
             if "llm" in self.fail or self.llm_reply is None:
                 return httpx.Response(503)

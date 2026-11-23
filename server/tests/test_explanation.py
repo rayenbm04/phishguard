@@ -135,3 +135,15 @@ def test_groq_uses_the_openai_format():
     client = LLMClient(httpx.AsyncClient(transport=httpx.MockTransport(handler)), "groq", "k")
     assert asyncio.run(client.complete_json("s", "u", 2)) == {"summary": "ok"}
     assert seen["url"].startswith("https://api.groq.com/openai/v1/")
+
+
+def test_busy_model_falls_back_to_the_next_free_model():
+    web = FakeWeb(
+        created={"poste-tn.top": days_ago(2)},
+        llm_reply=ai_reply(),
+        busy_models={"gemini-flash-latest"},
+    )
+    verdict, p = run(web, PARCEL)
+    assert verdict.summary.startswith("Ce message imite La Poste")
+    assert web.calls.count("llm") == 2
+    assert p.explainer.last_error is None
