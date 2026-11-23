@@ -24,7 +24,7 @@ def _read_env_file(path: Path) -> dict[str, str]:
 class Settings:
     safe_browsing_key: str = ""
     virustotal_key: str = ""
-    llm_provider: str = "gemini"  # gemini, anthropic or openai
+    llm_provider: str = "gemini"  # gemini or groq (free), anthropic or openai
     llm_api_key: str = ""
     llm_model: str = ""  # Empty: the provider's default model (see analysis/llm.py).
     # The app gives up after 8 s, so the server answers within this budget.

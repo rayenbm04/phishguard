@@ -10,8 +10,11 @@ class LLMError(Exception):
     """The model gave no usable answer (missing key, timeout, quota, bad JSON)."""
 
 
+# Free options: gemini (Google AI Studio free tier) and groq (free tier).
+# "gemini-flash-latest" always points to Google's current Flash model.
 DEFAULT_MODELS = {
-    "gemini": "gemini-2.5-flash",
+    "gemini": "gemini-flash-latest",
+    "groq": "llama-3.3-70b-versatile",
     "anthropic": "claude-haiku-5-5",
     "openai": "gpt-4.1-mini",
 }
@@ -34,7 +37,9 @@ class LLMClient:
         self.http = http
         self.provider = provider.lower().strip() or "gemini"
         if self.provider not in DEFAULT_MODELS:
-            raise ValueError(f"Unknown LLM_PROVIDER {provider!r}: use gemini, anthropic or openai")
+            raise ValueError(
+                f"Unknown LLM_PROVIDER {provider!r}: use gemini, groq, anthropic or openai"
+            )
         self.api_key = api_key
         self.model = model or DEFAULT_MODELS[self.provider]
 
@@ -62,7 +67,7 @@ class LLMClient:
             return body["candidates"][0]["content"]["parts"][0]["text"]
         if self.provider == "anthropic":
             return "".join(b["text"] for b in body["content"] if b.get("type") == "text")
-        return body["choices"][0]["message"]["content"]
+        return body["choices"][0]["message"]["content"]  # openai and groq
 
     async def _gemini(self, system: str, user: str, timeout: float) -> httpx.Response:
         url = (
@@ -97,9 +102,21 @@ class LLMClient:
             timeout=timeout,
         )
 
-    async def _openai(self, system: str, user: str, timeout: float) -> httpx.Response:
+    async def _groq(self, system: str, user: str, timeout: float) -> httpx.Response:
+        # Groq speaks the OpenAI format.
+        return await self._openai(
+            system, user, timeout, url="https://api.groq.com/openai/v1/chat/completions"
+        )
+
+    async def _openai(
+        self,
+        system: str,
+        user: str,
+        timeout: float,
+        url: str = "https://api.openai.com/v1/chat/completions",
+    ) -> httpx.Response:
         return await self.http.post(
-            "https://api.openai.com/v1/chat/completions",
+            url,
             headers={"Authorization": f"Bearer {self.api_key}"},
             json={
                 "model": self.model,

@@ -118,3 +118,20 @@ def test_without_llm_key_the_ai_is_not_called():
     web = FakeWeb(created={"poste-tn.top": days_ago(2)})
     run(web, PARCEL, llm=False)
     assert "llm" not in web.calls
+
+
+def test_groq_uses_the_openai_format():
+    import httpx
+
+    from phishguard_server.analysis.llm import LLMClient
+
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["url"] = str(request.url)
+        content = json.dumps({"summary": "ok"})
+        return httpx.Response(200, json={"choices": [{"message": {"content": content}}]})
+
+    client = LLMClient(httpx.AsyncClient(transport=httpx.MockTransport(handler)), "groq", "k")
+    assert asyncio.run(client.complete_json("s", "u", 2)) == {"summary": "ok"}
+    assert seen["url"].startswith("https://api.groq.com/openai/v1/")

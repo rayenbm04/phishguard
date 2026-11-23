@@ -21,7 +21,7 @@ Puis ouvrir http://127.0.0.1:8000/docs pour tester `/health`, `/analyse` et `/fe
 | --- | --- | --- |
 | `GOOGLE_SAFE_BROWSING_API_KEY` | Google Cloud Console → activer « Safe Browsing API » → Identifiants → Clé API | le contrôle échoue → verdict au mieux `UNSURE` |
 | `VIRUSTOTAL_API_KEY` | virustotal.com → profil → API Key (gratuit, 4 requêtes/min) | idem |
-| `LLM_API_KEY` | Gemini : aistudio.google.com → Get API key (gratuit). Ou une clé Anthropic / OpenAI avec `LLM_PROVIDER` | explication en phrases modèles (anglais), verdict identique |
+| `LLM_API_KEY` | Gratuit : Gemini (aistudio.google.com → Get API key, `LLM_PROVIDER=gemini`) ou Groq (console.groq.com → API Keys, `LLM_PROVIDER=groq`) | explication en phrases modèles (anglais), verdict identique |
 
 RDAP (âge des domaines) ne demande pas de clé. Les domaines `.tn` n'ont pas de RDAP public.
 
