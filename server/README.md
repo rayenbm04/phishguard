@@ -9,7 +9,7 @@ SD2 et SD3 ; depuis l'étape 4, l'IA rédige l'explication dans la langue du mes
 cd server
 python -m venv .venv                          # une seule fois
 .venv\Scripts\python -m pip install -e ".[dev]"
-copy .env.example .env                         # puis remplir les clés
+if (-not (Test-Path .env)) { copy .env.example .env }   # une seule fois, puis remplir les clés
 .venv\Scripts\python -m uvicorn phishguard_server.main:app --host 0.0.0.0 --reload
 ```
 
@@ -22,6 +22,8 @@ Puis ouvrir http://127.0.0.1:8000/docs pour tester `/health`, `/analyse` et `/fe
 | `GOOGLE_SAFE_BROWSING_API_KEY` | Google Cloud Console → activer « Safe Browsing API » → Identifiants → Clé API | le contrôle échoue → verdict au mieux `UNSURE` |
 | `VIRUSTOTAL_API_KEY` | virustotal.com → profil → API Key (gratuit, 4 requêtes/min) | idem |
 | `LLM_API_KEY` | Gratuit : Gemini (aistudio.google.com → Get API key, `LLM_PROVIDER=gemini`) ou Groq (console.groq.com → API Keys, `LLM_PROVIDER=groq`) | explication en phrases modèles (anglais), verdict identique |
+
+Attention : ne relancez jamais `copy .env.example .env` quand `.env` existe déjà. Sous PowerShell, `copy` écrase le fichier sans prévenir et vos clés sont perdues.
 
 RDAP (âge des domaines) ne demande pas de clé. Les domaines `.tn` n'ont pas de RDAP public.
 
