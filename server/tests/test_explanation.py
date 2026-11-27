@@ -6,7 +6,7 @@ import json
 from phishguard_server.analysis.clues import ClueExtractor
 from phishguard_server.analysis.known_scams import KnownScamMatcher
 from phishguard_server.analysis.text_heuristics import TextHeuristicCheck
-from phishguard_server.models import VerdictLevel
+from phishguard_server.models import AnalyseRequest, VerdictLevel
 
 from .fakes import FakeWeb, pipeline
 from .test_pipeline import days_ago, request
@@ -147,3 +147,17 @@ def test_busy_model_falls_back_to_the_next_free_model():
     assert verdict.summary.startswith("Ce message imite La Poste")
     assert web.calls.count("llm") == 2
     assert p.explainer.last_error is None
+
+
+def test_explanation_follows_the_app_language_not_the_message_language():
+    web = FakeWeb(created={"poste-tn.top": days_ago(2)}, llm_reply=ai_reply())
+    req = AnalyseRequest.model_validate(
+        {
+            "message": {"text": PARCEL, "maskedItems": 0, "language": "fr"},
+            "appVersion": "test",
+            "replyLanguage": "en",
+        }
+    )
+    asyncio.run(pipeline(web, llm=True).run(req))
+    system = json.loads(web.llm_prompts[0])["systemInstruction"]["parts"][0]["text"]
+    assert "in English" in system

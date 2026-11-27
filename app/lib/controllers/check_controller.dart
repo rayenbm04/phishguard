@@ -44,11 +44,14 @@ class CheckController extends ChangeNotifier {
 
   String? _lastMessage;
   String? _lastSourceApp;
+  Language? _lastReplyLanguage;
 
-  Future<void> startCheck(String message, {String? sourceApp}) async {
+  /// [replyLanguage]: language of the app, used for the explanation.
+  Future<void> startCheck(String message, {String? sourceApp, Language? replyLanguage}) async {
     if (_state.status == CheckStatus.analysing) return;
     _lastMessage = message;
     _lastSourceApp = sourceApp;
+    _lastReplyLanguage = replyLanguage;
 
     if (message.trim().isEmpty) {
       _set(const CheckState(status: CheckStatus.failed, failure: CheckFailure.emptyMessage));
@@ -62,7 +65,8 @@ class CheckController extends ChangeNotifier {
     _set(const CheckState(status: CheckStatus.analysing));
     final masked = masker.mask(message.trim());
     try {
-      final verdict = await api.analyse(masked, sourceApp: sourceApp);
+      final verdict =
+          await api.analyse(masked, sourceApp: sourceApp, replyLanguage: replyLanguage);
       try {
         await history.save(HistoryEntry(maskedText: masked.text, verdict: verdict));
       } catch (e) {
@@ -78,7 +82,9 @@ class CheckController extends ChangeNotifier {
 
   Future<void> retry() async {
     final message = _lastMessage;
-    if (message != null) await startCheck(message, sourceApp: _lastSourceApp);
+    if (message != null) {
+      await startCheck(message, sourceApp: _lastSourceApp, replyLanguage: _lastReplyLanguage);
+    }
   }
 
   void reset() => _set(const CheckState());

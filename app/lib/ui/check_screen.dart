@@ -66,7 +66,11 @@ class _CheckScreenState extends State<CheckScreen> {
 
   void _check() {
     FocusScope.of(context).unfocus();
-    _controller.startCheck(_text.text, sourceApp: widget.sourceApp);
+    _controller.startCheck(
+      _text.text,
+      sourceApp: widget.sourceApp,
+      replyLanguage: S.of(context).language,
+    );
   }
 
   @override

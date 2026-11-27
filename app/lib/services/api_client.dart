@@ -34,11 +34,16 @@ class ApiClient {
   final String baseUrl;
   final Duration timeout;
 
-  Future<Verdict> analyse(MaskedMessage message, {String? sourceApp}) async {
+  Future<Verdict> analyse(
+    MaskedMessage message, {
+    String? sourceApp,
+    Language? replyLanguage,
+  }) async {
     final request = AnalyseRequest(
       message: message,
       sourceApp: sourceApp,
       appVersion: appVersion,
+      replyLanguage: replyLanguage,
     );
     final body = await _post('/analyse', request.toJson(), expected: 200);
     return Verdict.fromJson(body);
