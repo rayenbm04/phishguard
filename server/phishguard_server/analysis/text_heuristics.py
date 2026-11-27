@@ -9,6 +9,16 @@ _SECRET = [
     "cvv", "cvc", "code pin", " pin ", "identifiant", "password", "passcode",
     "verification code", "security code", "login details", "رمز", "كلمة السر", "كود",
 ]  # fmt: skip
+# A real bank OTP says "never share it"; a scam asks you to send it.
+_ASK_VERB = [
+    "envoyez", "envoie", "renvoyez", "renvoie", "communiquez-nous", "donnez", "transmettez",
+    "saisissez", "confirmez", "send", "share it with us", "give us", "reply with", "enter",
+    "ابعث", "أرسل", "عطيني", "ابعثلي",
+]  # fmt: skip
+_NEVER_SHARE = [
+    "ne le communiquez", "ne le partagez", "ne le donnez", "never share", "do not share",
+    "don't share", "لا تشارك", "لا تعطي",
+]  # fmt: skip
 _FEE_TOPIC = [
     "colis", "livraison", "frais", "amende", "douane", "parcel", "delivery", "fee", "fine",
     "customs", "طرد", "رسوم", "مخالفة", "ديوانة",
@@ -46,7 +56,8 @@ class TextHeuristicCheck:
         amounts = clues.of(ClueType.AMOUNT)
         phones = clues.of(ClueType.PHONE)
 
-        if secret := _has(t, _SECRET):
+        secret = _has(t, _SECRET)
+        if secret and _has(t, _ASK_VERB) and not _has(t, _NEVER_SHARE):
             add("asks_secret", "The message asks for a secret code or password.", secret, 35)
         if (fee := _has(t, _FEE_TOPIC)) and amounts:
             add("small_fee", "The message asks you to pay a fee to receive something.", fee, 20)

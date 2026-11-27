@@ -7,9 +7,9 @@ SD2 et SD3 ; depuis l'étape 4, l'IA rédige l'explication dans la langue du mes
 
 ```powershell
 cd server
-python -m venv .venv                          # une seule fois
+python -m venv .venv                          
 .venv\Scripts\python -m pip install -e ".[dev]"
-copy .env.example .env                         # puis remplir les clés
+copy .env.example .env                         
 .venv\Scripts\python -m uvicorn phishguard_server.main:app --host 0.0.0.0 --reload
 ```
 
@@ -63,6 +63,24 @@ RDAP (âge des domaines) ne demande pas de clé. Les domaines `.tn` n'ont pas de
 
 Les tests n'appellent jamais Google, VirusTotal ou RDAP : `tests/fakes.py` les simule.
 
+## Avis des utilisateurs et mesure de la précision (étape 6)
+
+- Chaque verdict est enregistré **sans le message** (id, niveau, score, langue) dans `var/verdicts.jsonl`.
+- `POST /feedback` enregistre une note (1 à 5 étoiles) et/ou un signalement dans `var/feedback.jsonl`.
+  Le texte masqué n'est accepté qu'avec un signalement ; il va dans `var/scam_candidates.jsonl`
+  (statut `to_review`), pour être relu par l'équipe avant d'entrer dans `data/known_scams.json`.
+- `GET /stats` donne la note moyenne, la part de notes 4-5 étoiles (`helpfulRate`) et les
+  arnaques signalées alors que le verdict était `SAFE` (`missedScams`).
+- Précision sur un jeu de messages étiquetés (`data/eval_set.jsonl`, synthétique : ajoutez de vrais
+  messages anonymisés) :
+
+```powershell
+.venv\Scripts\python -m phishguard_server.evaluate            # règles seules, sans réseau
+.venv\Scripts\python -m phishguard_server.evaluate --online   # avec les vrais services (.env)
+```
+
+Il affiche précision, rappel, F1, couverture (part de réponses autres que `UNSURE`) et la liste des erreurs.
+
 ## Points d'entrée
 
 | Méthode | Chemin | Rôle |
@@ -70,6 +88,7 @@ Les tests n'appellent jamais Google, VirusTotal ou RDAP : `tests/fakes.py` les s
 | GET | `/health` | Le serveur répond |
 | POST | `/analyse` | Reçoit un `AnalyseRequest`, renvoie un `Verdict` |
 | POST | `/feedback` | Reçoit une note ou un signalement |
+| GET | `/stats` | Statistiques : verdicts par niveau, note moyenne, arnaques manquées |
 
 Les modèles sont dans `phishguard_server/models.py` ; les exemples JSON partagés avec l'app
 sont dans `../contracts/`.

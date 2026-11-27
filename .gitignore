@@ -19,3 +19,6 @@ Thumbs.db
 *.egg-info/
 build/
 dist/
+
+# Données du serveur (verdicts, avis, signalements)
+server/var/
