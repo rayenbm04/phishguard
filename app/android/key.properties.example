@@ -1,0 +1,7 @@
+# Copy to android/key.properties (ignored by Git) to sign the release APK with your key.
+# Create the key once:
+#   keytool -genkey -v -keystore D:\keys\phishguard.jks -keyalg RSA -keysize 2048 -validity 10000 -alias phishguard
+storePassword=
+keyPassword=
+keyAlias=phishguard
+storeFile=D:/keys/phishguard.jks
