@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../controllers/check_controller.dart';
+import '../l10n/strings.dart';
 import '../services/personal_data_masker.dart';
 import 'result_screen.dart';
 import 'theme.dart';
 
-/// Shows the message to check (shared, pasted or typed) and runs the check.
+/// Shows the message to check (shared, pasted, typed or read from a screenshot) and runs the check.
 class CheckScreen extends StatefulWidget {
   const CheckScreen({
     super.key,
@@ -14,12 +15,14 @@ class CheckScreen extends StatefulWidget {
     this.initialText = '',
     this.sourceApp,
     this.fromShare = false,
+    this.fromScreenshot = false,
   });
 
   final AppServices services;
   final String initialText;
   final String? sourceApp;
   final bool fromShare;
+  final bool fromScreenshot;
 
   @override
   State<CheckScreen> createState() => _CheckScreenState();
@@ -63,7 +66,11 @@ class _CheckScreenState extends State<CheckScreen> {
 
   void _check() {
     FocusScope.of(context).unfocus();
-    _controller.startCheck(_text.text, sourceApp: widget.sourceApp);
+    _controller.startCheck(
+      _text.text,
+      sourceApp: widget.sourceApp,
+      replyLanguage: S.of(context).language,
+    );
   }
 
   @override
@@ -78,22 +85,25 @@ class _CheckScreenState extends State<CheckScreen> {
     final state = _controller.state;
     final busy = state.status == CheckStatus.analysing;
     final text = Theme.of(context).textTheme;
+    final s = S.of(context);
+
+    String? origin;
+    if (widget.fromScreenshot) {
+      origin = s.textFromScreenshot;
+    } else if (widget.fromShare) {
+      origin = widget.sourceApp == null ? s.sharedWithApp : s.sharedFrom(widget.sourceApp!);
+    }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Check a message')),
+      appBar: AppBar(title: Text(s.checkTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
-            if (widget.fromShare)
+            if (origin != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  widget.sourceApp == null
-                      ? 'Shared with PhishGuard'
-                      : 'Shared from ${widget.sourceApp}',
-                  style: text.labelLarge?.copyWith(color: Pg.inkSoft),
-                ),
+                child: Text(origin, style: text.labelLarge?.copyWith(color: Pg.inkSoft)),
               ),
             TextField(
               key: const Key('messageField'),
@@ -102,12 +112,12 @@ class _CheckScreenState extends State<CheckScreen> {
               minLines: 5,
               maxLines: 12,
               maxLength: 5000,
-              decoration: const InputDecoration(
-                hintText: 'Paste the message, email or link here',
-              ),
+              decoration: InputDecoration(hintText: s.messageHint),
             ),
             const SizedBox(height: 4),
-            _PrivacyNote(hiddenItems: _hiddenItems),
+            _PrivacyNote(
+              text: _hiddenItems == 0 ? s.privacyNoteNone : s.privacyNoteCount(_hiddenItems),
+            ),
             const SizedBox(height: 20),
             if (state.status == CheckStatus.failed && state.failure != null)
               _FailureBox(failure: state.failure!, onRetry: busy ? null : _check),
@@ -115,19 +125,19 @@ class _CheckScreenState extends State<CheckScreen> {
               key: const Key('checkButton'),
               onPressed: busy ? null : _check,
               child: busy
-                  ? const Row(
+                  ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                         ),
-                        SizedBox(width: 12),
-                        Text('Checking...'),
+                        const SizedBox(width: 12),
+                        Text(s.checking),
                       ],
                     )
-                  : const Text('Check this message'),
+                  : Text(s.checkButton),
             ),
           ],
         ),
@@ -137,23 +147,19 @@ class _CheckScreenState extends State<CheckScreen> {
 }
 
 class _PrivacyNote extends StatelessWidget {
-  const _PrivacyNote({required this.hiddenItems});
+  const _PrivacyNote({required this.text});
 
-  final int hiddenItems;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    final detail = hiddenItems == 0
-        ? 'Phone, card and ID numbers are hidden before the message leaves your phone.'
-        : '$hiddenItems personal number${hiddenItems > 1 ? 's' : ''} '
-            '(phone, card or ID) will be hidden before the message leaves your phone.';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Icon(Icons.lock_outline, size: 18, color: Pg.safe),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(detail,
+          child: Text(text,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Pg.inkSoft)),
         ),
       ],
@@ -169,27 +175,23 @@ class _FailureBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (title, body) = switch (failure) {
-      CheckFailure.emptyMessage => ('Nothing to check', 'Paste or type a message first.'),
-      CheckFailure.offline => (
-          "You're offline. Don't open the link yet.",
-          'Connect to the internet, then try again.'
-        ),
-      CheckFailure.serverUnreachable => (
-          "PhishGuard can't be reached. Try again.",
-          'Until then, treat the message with care.'
-        ),
+    final s = S.of(context);
+    final (title, body, icon) = switch (failure) {
+      CheckFailure.emptyMessage => (s.errEmptyTitle, s.errEmptyBody, Icons.edit_note),
+      CheckFailure.offline => (s.errOfflineTitle, s.errOfflineBody, Icons.wifi_off_rounded),
+      CheckFailure.serverUnreachable => (s.errServerTitle, s.errServerBody, Icons.cloud_off),
     };
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Card(
+        key: Key('failure-${failure.name}'),
         color: Pg.suspicious.withValues(alpha: 0.08),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.wifi_off_rounded, color: Pg.suspicious),
+              Icon(icon, color: Pg.suspicious),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -199,7 +201,7 @@ class _FailureBox extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(body),
                     if (failure != CheckFailure.emptyMessage)
-                      TextButton(onPressed: onRetry, child: const Text('Try again')),
+                      TextButton(onPressed: onRetry, child: Text(s.tryAgain)),
                   ],
                 ),
               ),

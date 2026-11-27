@@ -74,7 +74,7 @@ abstract final class Pg {
   }
 }
 
-/// Colour, icon and words for each verdict level.
+/// Colour and icon for each verdict level (words: S.levelLabel).
 extension VerdictLevelLook on VerdictLevel {
   Color get color => switch (this) {
         VerdictLevel.fraudulent => Pg.fraudulent,
@@ -88,13 +88,6 @@ extension VerdictLevelLook on VerdictLevel {
         VerdictLevel.suspicious => Icons.warning_amber_rounded,
         VerdictLevel.safe => Icons.verified_outlined,
         VerdictLevel.unsure => Icons.help_outline,
-      };
-
-  String get label => switch (this) {
-        VerdictLevel.fraudulent => 'Scam',
-        VerdictLevel.suspicious => 'Suspicious',
-        VerdictLevel.safe => 'Looks safe',
-        VerdictLevel.unsure => 'Unsure',
       };
 }
 

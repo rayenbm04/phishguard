@@ -37,6 +37,8 @@ class AnalyseRequest(ApiModel):
     message: MaskedMessage
     source_app: str | None = None
     app_version: str
+    # Language of the app: the explanation is written in it. Defaults to the message language.
+    reply_language: Language | None = None
 
 
 class Reason(ApiModel):

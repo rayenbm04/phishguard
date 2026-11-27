@@ -73,7 +73,7 @@ class AnalysisPipeline:
             has_links,
             self.contacts.contacts_for(evidence),
             text,
-            request.message.language,
+            request.reply_language or request.message.language,
             timeout=time_left,
         )
         if self.explainer.last_error:
