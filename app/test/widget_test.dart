@@ -156,10 +156,12 @@ void main() {
       home: ResultScreen(verdict: verdict, maskedText: 'Payez ici [PHONE]', api: api),
     ));
 
-    await tester.scrollUntilVisible(find.byKey(const Key('reportScam')), 300);
+    // The page scrolls; the comment field has its own scrollable, so name the page's one.
+    final page = find.byType(Scrollable).first;
+    await tester.scrollUntilVisible(find.byKey(const Key('reportScam')), 300, scrollable: page);
     await tester.tap(find.byKey(const Key('star-4')));
     await tester.pump();
-    await tester.scrollUntilVisible(find.byKey(const Key('sendFeedback')), 100);
+    await tester.scrollUntilVisible(find.byKey(const Key('sendFeedback')), 100, scrollable: page);
     await tester.runAsync(() async {
       await tester.tap(find.byKey(const Key('sendFeedback')));
       await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -169,7 +171,7 @@ void main() {
     expect(sent.single['rating'], 4);
     expect(sent.single['maskedText'], isNull); // The text is never sent with a simple rating.
 
-    await tester.scrollUntilVisible(find.byKey(const Key('reportScam')), 100);
+    await tester.scrollUntilVisible(find.byKey(const Key('reportScam')), 100, scrollable: page);
     await tester.tap(find.byKey(const Key('reportScam')));
     await tester.pumpAndSettle();
     await tester.runAsync(() async {
