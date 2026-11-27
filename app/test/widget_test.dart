@@ -7,6 +7,7 @@ import 'package:http/testing.dart';
 import 'package:phishguard/main.dart';
 import 'package:phishguard/services/api_client.dart';
 import 'package:phishguard/services/connectivity_service.dart';
+import 'package:phishguard/services/screenshot_reader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnlineConnectivity extends ConnectivityService {
@@ -16,29 +17,86 @@ class OnlineConnectivity extends ConnectivityService {
   Future<bool> isOnline() async => true;
 }
 
+class FakeScreenshotReader extends ScreenshotReader {
+  const FakeScreenshotReader(this.text);
+  final String text;
+
+  @override
+  Future<String?> pickImage() async => '/fake/screenshot.png';
+
+  @override
+  Future<String> readText(String imagePath) async => text;
+}
+
+const setupDone = {'settings.privacyAccepted': true, 'settings.language': 'en'};
+
+AppServices services({String screenshotText = ''}) => AppServices(
+      api: ApiClient(
+        baseUrl: 'http://test',
+        client: MockClient((_) async => http.Response(
+              File('../contracts/verdict.example.json').readAsStringSync(),
+              200,
+            )),
+      ),
+      connectivity: const OnlineConnectivity(),
+      screenshots: FakeScreenshotReader(screenshotText),
+    );
+
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  testWidgets('first launch: privacy consent, then language (SD4)', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(PhishGuardApp(services: services()));
+    await tester.pumpAndSettle();
 
-  AppServices services() => AppServices(
-        api: ApiClient(
-          baseUrl: 'http://test',
-          client: MockClient((_) async => http.Response(
-                File('../contracts/verdict.example.json').readAsStringSync(),
-                200,
-              )),
-        ),
-        connectivity: const OnlineConnectivity(),
-      );
+    // Continue stays disabled until the user agrees.
+    final continueButton = find.byKey(const Key('continueButton'));
+    expect(tester.widget<FilledButton>(continueButton).onPressed, isNull);
+    await tester.tap(find.byKey(const Key('agreeBox')));
+    await tester.pump();
+    expect(tester.widget<FilledButton>(continueButton).onPressed, isNotNull);
+    await tester.tap(continueButton);
+    await tester.pumpAndSettle();
 
-  testWidgets('shows the PhishGuard home screen', (tester) async {
+    await tester.tap(find.byKey(const Key('language-fr')));
+    await tester.pumpAndSettle();
+    expect(find.text('Coller et analyser'), findsOneWidget);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool('settings.privacyAccepted'), isTrue);
+    expect(prefs.getString('settings.language'), 'fr');
+  });
+
+  testWidgets('home screen once the setup is done', (tester) async {
+    SharedPreferences.setMockInitialValues(setupDone);
     await tester.pumpWidget(PhishGuardApp(services: services()));
     await tester.pumpAndSettle();
     expect(find.text('PhishGuard'), findsOneWidget);
     expect(find.text('Paste and analyse'), findsOneWidget);
-    expect(find.text('Type a message or link'), findsOneWidget);
+    expect(find.text('Check a screenshot'), findsOneWidget);
   });
 
-  testWidgets('type a message, check it, see the verdict', (tester) async {
+  testWidgets('Arabic interface is right to left', (tester) async {
+    SharedPreferences.setMockInitialValues({'settings.privacyAccepted': true, 'settings.language': 'ar'});
+    await tester.pumpWidget(PhishGuardApp(services: services()));
+    await tester.pumpAndSettle();
+    expect(find.text('الصق وحلّل'), findsOneWidget);
+    final direction = Directionality.of(tester.element(find.text('الصق وحلّل')));
+    expect(direction, TextDirection.rtl);
+  });
+
+  testWidgets('changing the language in the settings', (tester) async {
+    SharedPreferences.setMockInitialValues(setupDone);
+    await tester.pumpWidget(PhishGuardApp(services: services()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('settingsButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('settings-language-fr')));
+    await tester.pumpAndSettle();
+    expect(find.text('Réglages'), findsOneWidget);
+  });
+
+  testWidgets('type a message, check it, see the verdict (SD1)', (tester) async {
+    SharedPreferences.setMockInitialValues(setupDone);
     await tester.pumpWidget(PhishGuardApp(services: services()));
     await tester.pumpAndSettle();
 
@@ -56,5 +114,26 @@ void main() {
 
     expect(find.text('Scam'), findsOneWidget);
     expect(find.text('Why'), findsOneWidget);
+  });
+
+  testWidgets('screenshot text is shown for confirmation (SD3)', (tester) async {
+    SharedPreferences.setMockInitialValues(setupDone);
+    await tester.pumpWidget(
+        PhishGuardApp(services: services(screenshotText: 'Your parcel is held, pay 2 DT')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('screenshotButton')));
+    await tester.pumpAndSettle();
+    expect(find.text('Text read from the screenshot: check it, then start the check.'),
+        findsOneWidget);
+    expect(find.text('Your parcel is held, pay 2 DT'), findsOneWidget);
+  });
+
+  testWidgets('screenshot without text shows a message', (tester) async {
+    SharedPreferences.setMockInitialValues(setupDone);
+    await tester.pumpWidget(PhishGuardApp(services: services()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('screenshotButton')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('No text found in this image'), findsOneWidget);
   });
 }
