@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/strings.dart';
 import '../models/models.dart';
 import 'theme.dart';
 
@@ -14,31 +15,32 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final level = verdict.level;
     final text = Theme.of(context).textTheme;
+    final s = S.of(context);
     final reasons = [...verdict.reasons]..sort((a, b) => a.rank.compareTo(b.rank));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Result')),
+      appBar: AppBar(title: Text(s.resultTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
             _VerdictBanner(verdict: verdict),
             const SizedBox(height: 24),
-            Text('Why', style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(s.why, style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             for (final reason in reasons) _ReasonTile(reason: reason, color: level.color),
             const SizedBox(height: 20),
-            Text('What to do now',
+            Text(s.whatToDo,
                 style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             for (final advice in verdict.advice) _AdviceTile(advice: advice),
             const SizedBox(height: 12),
-            Text('Checked on ${shortDate(verdict.checkedAt)}',
+            Text(s.checkedOn(shortDate(verdict.checkedAt)),
                 style: text.bodySmall?.copyWith(color: Pg.inkSoft)),
             const SizedBox(height: 24),
             FilledButton(
               onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-              child: Text(fromHistory ? 'Back' : 'Check another message'),
+              child: Text(fromHistory ? s.back : s.checkAnother),
             ),
           ],
         ),
@@ -56,8 +58,9 @@ class _VerdictBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final level = verdict.level;
     final text = Theme.of(context).textTheme;
+    final s = S.of(context);
     return Semantics(
-      label: 'Verdict: ${level.label}, risk ${verdict.riskScore} out of 100',
+      label: '${s.levelLabel(level)}, ${verdict.riskScore} ${s.riskOutOf100}',
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
@@ -72,7 +75,7 @@ class _VerdictBanner extends StatelessWidget {
                 Icon(level.icon, color: Colors.white, size: 34),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(level.label,
+                  child: Text(s.levelLabel(level),
                       style: text.headlineMedium?.copyWith(
                           color: Colors.white, fontWeight: FontWeight.w800)),
                 ),
@@ -82,7 +85,7 @@ class _VerdictBanner extends StatelessWidget {
                     Text('${verdict.riskScore}',
                         style: text.headlineSmall?.copyWith(
                             color: Colors.white, fontWeight: FontWeight.w800)),
-                    Text('risk / 100',
+                    Text(s.riskOutOf100,
                         style: text.labelSmall?.copyWith(color: Colors.white70)),
                   ],
                 ),
@@ -106,10 +109,11 @@ class _ReasonTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final details = [
       if (reason.evidenceDetail != null) reason.evidenceDetail!,
-      'Source: ${reason.evidenceSource}',
-      if (reason.checkedDate != null) 'Checked on ${shortDate(reason.checkedDate!)}',
+      s.source(reason.evidenceSource),
+      if (reason.checkedDate != null) s.checkedOn(shortDate(reason.checkedDate!)),
     ];
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -154,7 +158,7 @@ class _AdviceTile extends StatelessWidget {
           title: Text(advice.action),
           subtitle: advice.officialContact == null
               ? null
-              : Text('Official contact: ${advice.officialContact}'),
+              : Text(S.of(context).officialContact(advice.officialContact!)),
         ),
       ),
     );
