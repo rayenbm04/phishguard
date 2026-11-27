@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,9 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:phishguard/main.dart';
+import 'package:phishguard/models/models.dart';
 import 'package:phishguard/services/api_client.dart';
 import 'package:phishguard/services/connectivity_service.dart';
 import 'package:phishguard/services/screenshot_reader.dart';
+import 'package:phishguard/ui/result_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnlineConnectivity extends ConnectivityService {
@@ -135,5 +138,47 @@ void main() {
     await tester.tap(find.byKey(const Key('screenshotButton')));
     await tester.pumpAndSettle();
     expect(find.textContaining('No text found in this image'), findsOneWidget);
+  });
+
+  testWidgets('rate a verdict, then report it as a scam (SD6)', (tester) async {
+    final sent = <Map<String, dynamic>>[];
+    final api = ApiClient(
+      baseUrl: 'http://test',
+      client: MockClient((request) async {
+        sent.add(jsonDecode(request.body) as Map<String, dynamic>);
+        return http.Response('{"status": "received"}', 201);
+      }),
+    );
+    final verdict = Verdict.fromJson(
+        jsonDecode(File('../contracts/verdict.example.json').readAsStringSync())
+            as Map<String, dynamic>);
+    await tester.pumpWidget(MaterialApp(
+      home: ResultScreen(verdict: verdict, maskedText: 'Payez ici [PHONE]', api: api),
+    ));
+
+    await tester.scrollUntilVisible(find.byKey(const Key('reportScam')), 300);
+    await tester.tap(find.byKey(const Key('star-4')));
+    await tester.pump();
+    await tester.scrollUntilVisible(find.byKey(const Key('sendFeedback')), 100);
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const Key('sendFeedback')));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    await tester.pumpAndSettle();
+    expect(find.text('Thanks, your feedback was sent.'), findsOneWidget);
+    expect(sent.single['rating'], 4);
+    expect(sent.single['maskedText'], isNull); // The text is never sent with a simple rating.
+
+    await tester.scrollUntilVisible(find.byKey(const Key('reportScam')), 100);
+    await tester.tap(find.byKey(const Key('reportScam')));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const Key('confirmReport')));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    await tester.pumpAndSettle();
+    expect(find.text('Thanks, your report was sent.'), findsOneWidget);
+    expect(sent.last['reportedAsScam'], isTrue);
+    expect(sent.last['maskedText'], 'Payez ici [PHONE]');
   });
 }

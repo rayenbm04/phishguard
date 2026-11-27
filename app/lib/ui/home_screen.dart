@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../app.dart';
 import '../l10n/strings.dart';
+import '../services/api_client.dart';
 import '../services/history_repository.dart';
 import 'check_screen.dart';
 import 'result_screen.dart';
@@ -137,7 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
             if (_history.isEmpty)
               Text(s.historyEmpty, style: text.bodyMedium?.copyWith(color: Pg.inkSoft))
             else
-              for (final entry in _history.take(10)) _HistoryTile(entry: entry),
+              for (final entry in _history.take(10))
+                _HistoryTile(entry: entry, api: widget.services.api),
           ],
         ),
       ),
@@ -169,9 +171,10 @@ class _ShareTip extends StatelessWidget {
 }
 
 class _HistoryTile extends StatelessWidget {
-  const _HistoryTile({required this.entry});
+  const _HistoryTile({required this.entry, required this.api});
 
   final HistoryEntry entry;
+  final ApiClient api;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +187,12 @@ class _HistoryTile extends StatelessWidget {
           title: Text(entry.maskedText, maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text('${S.of(context).levelLabel(level)} · ${shortDate(entry.verdict.checkedAt)}'),
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (_) => ResultScreen(verdict: entry.verdict, fromHistory: true),
+            builder: (_) => ResultScreen(
+              verdict: entry.verdict,
+              fromHistory: true,
+              maskedText: entry.maskedText,
+              api: api,
+            ),
           )),
         ),
       ),

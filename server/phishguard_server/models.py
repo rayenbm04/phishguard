@@ -71,7 +71,7 @@ class Verdict(ApiModel):
 
 class Feedback(ApiModel):
     verdict_id: str
-    rating: int = Field(ge=1, le=5)
+    rating: int | None = Field(default=None, ge=1, le=5)  # Stars; optional for a report.
     reported_as_scam: bool = False
     masked_text: str | None = None
     comment: str | None = Field(default=None, max_length=500)
@@ -81,4 +81,6 @@ class Feedback(ApiModel):
         # Privacy rule: the message text is only sent when the user reports a scam.
         if self.masked_text is not None and not self.reported_as_scam:
             raise ValueError("maskedText is only allowed when reportedAsScam is true")
+        if self.rating is None and not self.reported_as_scam:
+            raise ValueError("send a rating, a scam report, or both")
         return self

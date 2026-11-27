@@ -17,11 +17,15 @@ class CheckState {
   const CheckState({
     this.status = CheckStatus.idle,
     this.verdict,
+    this.maskedText,
     this.failure,
   });
 
   final CheckStatus status;
   final Verdict? verdict;
+
+  /// The text that was sent (personal numbers hidden), used if the user reports a scam.
+  final String? maskedText;
   final CheckFailure? failure;
 }
 
@@ -72,7 +76,7 @@ class CheckController extends ChangeNotifier {
       } catch (e) {
         debugPrint('History not saved: $e'); // The verdict matters more.
       }
-      _set(CheckState(status: CheckStatus.done, verdict: verdict));
+      _set(CheckState(status: CheckStatus.done, verdict: verdict, maskedText: masked.text));
     } catch (e) {
       // ApiException, or an answer that does not match the contract.
       debugPrint('Check failed: $e');

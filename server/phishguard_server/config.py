@@ -33,6 +33,8 @@ class Settings:
     http_timeout: float = 3.5
     # Link and domain checks stop after this many seconds; the rest is for the AI.
     checks_timeout: float = 5.0
+    # Where verdicts, feedback and reported scams are saved (JSON Lines files).
+    data_dir: Path = Path(__file__).resolve().parents[1] / "var"
 
     @classmethod
     def load(cls, env_file: Path = ENV_FILE) -> "Settings":
@@ -41,7 +43,9 @@ class Settings:
         def get(name: str) -> str:
             return os.environ.get(name) or file_values.get(name, "")
 
+        data_dir = get("DATA_DIR")
         return cls(
+            data_dir=Path(data_dir) if data_dir else cls.data_dir,
             safe_browsing_key=get("GOOGLE_SAFE_BROWSING_API_KEY"),
             virustotal_key=get("VIRUSTOTAL_API_KEY"),
             llm_provider=get("LLM_PROVIDER") or "gemini",

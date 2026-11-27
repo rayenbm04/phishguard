@@ -42,4 +42,9 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('feedback needs a rating or a report', () {
+    expect(() => UserFeedback(verdictId: 'x'), throwsArgumentError);
+    expect(UserFeedback(verdictId: 'x', reportedAsScam: true).rating, isNull);
+  });
 }
