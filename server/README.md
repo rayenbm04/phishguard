@@ -81,6 +81,10 @@ Les tests n'appellent jamais Google, VirusTotal ou RDAP : `tests/fakes.py` les s
 
 Il affiche précision, rappel, F1, couverture (part de réponses autres que `UNSURE`) et la liste des erreurs.
 
+## Mise en ligne
+
+`Dockerfile` (image du serveur) et `../render.yaml` (Render, offre gratuite) : voir `../docs/RELEASE.md`.
+
 ## Points d'entrée
 
 | Méthode | Chemin | Rôle |

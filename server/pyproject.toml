@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phishguard-server"
-version = "0.6.0"
-description = "PhishGuard analysis API (FastAPI + LangGraph)"
+version = "1.0.0"
+description = "PhishGuard analysis API (FastAPI)"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.115",
