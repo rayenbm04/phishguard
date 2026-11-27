@@ -3,7 +3,7 @@
 class UserFeedback {
   UserFeedback({
     required this.verdictId,
-    required this.rating,
+    this.rating,
     this.reportedAsScam = false,
     this.maskedText,
     this.comment,
@@ -11,17 +11,21 @@ class UserFeedback {
     if (maskedText != null && !reportedAsScam) {
       throw ArgumentError('maskedText is only allowed when reportedAsScam is true');
     }
+    if (rating == null && !reportedAsScam) {
+      throw ArgumentError('send a rating, a scam report, or both');
+    }
   }
 
   final String verdictId;
-  final int rating;
+  /// 1 to 5 stars; optional when the user only reports a scam.
+  final int? rating;
   final bool reportedAsScam;
   final String? maskedText;
   final String? comment;
 
   factory UserFeedback.fromJson(Map<String, dynamic> json) => UserFeedback(
         verdictId: json['verdictId'] as String,
-        rating: json['rating'] as int,
+        rating: json['rating'] as int?,
         reportedAsScam: json['reportedAsScam'] as bool? ?? false,
         maskedText: json['maskedText'] as String?,
         comment: json['comment'] as String?,

@@ -148,6 +148,30 @@ class S {
         VerdictLevel.unsure => _t('Incertain', 'غير مؤكد', 'Unsure'),
       };
 
+  // ---------- Feedback (SD6) ----------
+  String get feedbackQuestion =>
+      _t('Ce verdict vous a-t-il aidé ?', 'هل ساعدك هذا الحكم؟', 'Was this verdict helpful?');
+  String starsLabel(int n) => _t('$n étoile${n > 1 ? 's' : ''} sur 5', '$n من 5 نجوم',
+      '$n star${n > 1 ? 's' : ''} out of 5');
+  String get commentHint =>
+      _t('Un commentaire ? (facultatif)', 'تعليق؟ (اختياري)', 'A comment? (optional)');
+  String get send => _t('Envoyer', 'إرسال', 'Send');
+  String get reportScam => _t('Signaler comme arnaque', 'الإبلاغ عن احتيال', 'Report as scam');
+  String get reportExplain => _t(
+        'Le texte vérifié, sans vos numéros personnels, sera envoyé à l\'équipe PhishGuard pour '
+            'reconnaître cette arnaque à l\'avenir.',
+        'سيُرسل النص الذي تم فحصه، دون أرقامك الشخصية، إلى فريق PhishGuard للتعرّف على هذا الاحتيال مستقبلا.',
+        'The checked text, without your personal numbers, will be sent to the PhishGuard team so '
+            'this scam is recognised in the future.',
+      );
+  String get report => _t('Signaler', 'إبلاغ', 'Report');
+  String get feedbackThanks =>
+      _t('Merci, votre avis a été envoyé.', 'شكرا، تم إرسال رأيك.', 'Thanks, your feedback was sent.');
+  String get reportThanks => _t('Merci, votre signalement a été envoyé.', 'شكرا، تم إرسال بلاغك.',
+      'Thanks, your report was sent.');
+  String get feedbackError => _t('Envoi impossible. Réessayez plus tard.',
+      'تعذّر الإرسال. أعد المحاولة لاحقا.', 'Could not send. Try again later.');
+
   // ---------- Onboarding ----------
   String get onboardingTitle => _t(
         'Un deuxième avis sur n\'importe quel message',

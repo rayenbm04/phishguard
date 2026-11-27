@@ -2,14 +2,28 @@ import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
 import '../models/models.dart';
+import '../services/api_client.dart';
+import 'feedback_card.dart';
 import 'theme.dart';
 
 /// The verdict, its top reasons and what to do now (end of SD1).
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({super.key, required this.verdict, this.fromHistory = false});
+  const ResultScreen({
+    super.key,
+    required this.verdict,
+    this.fromHistory = false,
+    this.maskedText,
+    this.api,
+  });
 
   final Verdict verdict;
   final bool fromHistory;
+
+  /// The masked text that was checked: sent only if the user reports a scam.
+  final String? maskedText;
+
+  /// Needed to send feedback (SD6); without it the feedback card is hidden.
+  final ApiClient? api;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +51,10 @@ class ResultScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(s.checkedOn(shortDate(verdict.checkedAt)),
                 style: text.bodySmall?.copyWith(color: Pg.inkSoft)),
+            if (api != null) ...[
+              const SizedBox(height: 24),
+              FeedbackCard(verdict: verdict, maskedText: maskedText, api: api!),
+            ],
             const SizedBox(height: 24),
             FilledButton(
               onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),

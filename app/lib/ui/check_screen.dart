@@ -57,7 +57,11 @@ class _CheckScreenState extends State<CheckScreen> {
     final state = _controller.state;
     if (state.status == CheckStatus.done && state.verdict != null) {
       Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
-        builder: (_) => ResultScreen(verdict: state.verdict!),
+        builder: (_) => ResultScreen(
+          verdict: state.verdict!,
+          maskedText: state.maskedText,
+          api: widget.services.api,
+        ),
       ));
     } else {
       setState(() {});
