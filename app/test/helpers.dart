@@ -128,7 +128,9 @@ Future<FakeAdapter> pumpApp(
     ],
     child: const PhishGuardApp(),
   ));
-  await tester.pumpAndSettle(); // Splash, then home or onboarding.
+  // The splash waits on a timer: pumpAndSettle alone would not move the clock.
+  await tester.pump(const Duration(milliseconds: 1500));
+  await tester.pumpAndSettle(); // Then home or onboarding.
   return api;
 }
 
