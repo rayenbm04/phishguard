@@ -97,8 +97,11 @@ void main() {
     expect(api.bodies.single['replyLanguage'], 'en');
 
     final page = find.descendant(of: find.byKey(const Key('resultList')), matching: find.byType(Scrollable)).first;
-    await tester.scrollUntilVisible(find.text('Why'), 300, scrollable: page);
-    expect(find.text('The link is listed as phishing.'), findsOneWidget);
+    // Scroll to the reason itself: the "Why" heading can be visible while the card is not built yet.
+    await tester.scrollUntilVisible(find.text('The link is listed as phishing.'), 200, scrollable: page);
+    expect(find.text('Why'), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const Key('reason-1')));
+    await tester.pumpAndSettle();
 
     // The evidence opens on tap.
     await tester.tap(find.byKey(const Key('reason-1')));
