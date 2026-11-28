@@ -93,7 +93,6 @@ class _LanguageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final rtl = language == Language.arabic;
     return Material(
       color: selected ? scheme.primaryContainer : scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
@@ -113,10 +112,8 @@ class _LanguageTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(languageName(language),
-                        textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
                         style: theme.textTheme.titleMedium),
                     Text(sample(language),
-                        textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
                         style: theme.textTheme.bodySmall),
                   ],
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:phishguard/core/services/personal_data_masker.dart';
+import 'package:phishguard/core/utils/formatters.dart';
 import 'package:phishguard/core/utils/l10n.dart';
 
 /// A masked message, with each hidden number shown as a small locked tag
@@ -65,6 +66,7 @@ class MaskedText extends StatelessWidget {
     if (last < text.length) spans.add(TextSpan(text: text.substring(last)));
     return Text.rich(
       TextSpan(style: base, children: spans),
+      textDirection: directionOf(text),
       maxLines: maxLines,
       overflow: overflow,
     );

@@ -46,9 +46,7 @@ class SettingsScreen extends ConsumerWidget {
                     RadioListTile<Language>(
                       key: Key('settings-language-${option.code}'),
                       value: option,
-                      title: Text(languageName(option),
-                          textDirection:
-                              option == Language.arabic ? TextDirection.rtl : TextDirection.ltr),
+                      title: Text(languageName(option)),
                       controlAffinity: ListTileControlAffinity.trailing,
                     ),
                   ],

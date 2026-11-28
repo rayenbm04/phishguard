@@ -70,6 +70,7 @@ class HistoryTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       MaskedText.plain(context, entry.maskedText).replaceAll('\n', ' '),
+                      textDirection: directionOf(entry.maskedText),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodyMedium,
