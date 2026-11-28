@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' show DateFormat; // intl has its own TextDirection.
 
 import 'package:phishguard/core/utils/l10n.dart';
 
