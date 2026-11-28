@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:phishguard/models/models.dart';
+import 'package:phishguard/core/models/models.dart';
 
 /// Reads the shared examples in ../contracts (flutter test runs from app/).
 Map<String, dynamic> load(String name) =>

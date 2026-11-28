@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:phishguard/models/models.dart';
-import 'package:phishguard/services/personal_data_masker.dart';
+import 'package:phishguard/core/models/models.dart';
+import 'package:phishguard/core/services/personal_data_masker.dart';
 
 void main() {
   const masker = PersonalDataMasker();

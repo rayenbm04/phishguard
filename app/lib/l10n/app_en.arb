@@ -1,0 +1,302 @@
+{
+  "@@locale": "en",
+  "navCheck": "Check",
+  "@navCheck": {
+    "description": "Bottom bar: home tab"
+  },
+  "navHistory": "History",
+  "@navHistory": {
+    "description": "Bottom bar"
+  },
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "Bottom bar"
+  },
+  "settings": "Settings",
+  "splashTagline": "A second opinion on any message",
+  "onboardingProgress": "Step {step} of {total}",
+  "@onboardingProgress": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "introTitle": "Not sure about a message? Ask first.",
+  "introBody": "PhishGuard tells you if an SMS, an email or a link is a scam, explains why and tells you what to do.",
+  "introStep1Title": "Share or paste the message",
+  "introStep1Body": "From WhatsApp, SMS or Gmail, or a screenshot of it.",
+  "introStep2Title": "PhishGuard checks it",
+  "introStep2Body": "Links, websites, known scams and warning words.",
+  "introStep3Title": "You get a clear answer",
+  "introStep3Body": "The verdict, the reasons behind it, and what to do now.",
+  "continueLabel": "Continue",
+  "privacyTitle": "Your privacy comes first",
+  "privacyIntro": "Before you start, here is how PhishGuard protects it:",
+  "promise1Title": "Your numbers are hidden on the phone",
+  "promise1Body": "Phone, card and ID numbers are replaced before any check.",
+  "promise2Title": "No account, only the masked text",
+  "promise2Body": "Only the masked text is sent for the check. Screenshots never leave the phone.",
+  "promise3Title": "Your history stays here",
+  "promise3Body": "Past checks are kept on this phone only, and you can clear them at any time.",
+  "iAgree": "I agree to these terms",
+  "chooseLanguage": "Choose your language",
+  "chooseLanguageBody": "Explanations are written in this language too. You can change it later in Settings.",
+  "startChecking": "Start checking",
+  "homeHeadline": "Got a strange message?",
+  "homeSubtitle": "Check it before you click, pay or call back.",
+  "messageHint": "Paste the message, email or link here",
+  "paste": "Paste",
+  "screenshot": "Screenshot",
+  "clearText": "Clear",
+  "@clearText": {
+    "description": "Clears a text field"
+  },
+  "nothingToPaste": "Nothing to paste: copy the message first.",
+  "sharedWithApp": "Shared with PhishGuard",
+  "sharedFrom": "Shared from {app}",
+  "@sharedFrom": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyNoteNone": "Phone, card and ID numbers are hidden before the message leaves your phone.",
+  "privacyNoteCount": "{count, plural, =1{1 personal number will be hidden before the message leaves your phone.} other{{count} personal numbers will be hidden before the message leaves your phone.}}",
+  "@privacyNoteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkButton": "Check this message",
+  "recentChecks": "Recent checks",
+  "seeAll": "See all",
+  "historyEmptyHome": "Your checks will appear here. They stay on this phone.",
+  "shareTip": "Faster: in WhatsApp, SMS or Gmail, long-press the message, tap Share, then choose PhishGuard.",
+  "analysisTitle": "Checking the message",
+  "analysisFailedTitle": "Check not finished",
+  "whatIsSent": "What is sent for the check",
+  "hiddenInMessage": "{count, plural, =1{1 personal number was hidden on your phone.} other{{count} personal numbers were hidden on your phone.}}",
+  "@hiddenInMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nothingHidden": "No personal number found to hide.",
+  "stepClues": "Finding the clues",
+  "stepCluesBody": "Links, numbers, amounts and urgent words, found on your phone.",
+  "stepLinks": "Checking links and reputation",
+  "stepLinksBody": "Phishing lists, the age of each website, imitated brands.",
+  "stepScams": "Comparing with known scams",
+  "stepScamsBody": "Fake parcels, fines, banks, prizes and other known tricks.",
+  "stepVerdict": "Deciding the verdict",
+  "stepVerdictBody": "Fixed rules decide; the explanation is written in your language.",
+  "analysisWaitNote": "A check takes a few seconds. Nothing is opened while it runs.",
+  "errEmptyTitle": "Nothing to check",
+  "errEmptyBody": "Paste or type a message first.",
+  "errOfflineTitle": "You’re offline. Don’t open the link yet.",
+  "errOfflineBody": "Connect to the internet, then try again.",
+  "errTimeoutTitle": "The check took too long",
+  "errTimeoutBody": "PhishGuard did not answer within 8 seconds. Try again in a moment.",
+  "errServerTitle": "PhishGuard can’t be reached right now",
+  "errServerBody": "Try again in a moment.",
+  "meanwhileAdvice": "Until you get a verdict, don’t click, pay or call back.",
+  "tryAgain": "Try again",
+  "editMessage": "Edit the message",
+  "resultTitle": "Result",
+  "pastCheck": "Past check",
+  "levelFraudulent": "Scam",
+  "levelSuspicious": "Suspicious",
+  "levelSafe": "Looks safe",
+  "levelUnsure": "Unsure",
+  "headlineFraudulent": "Don’t reply, click or pay.",
+  "headlineSuspicious": "Be careful before you act.",
+  "headlineSafe": "No warning sign found.",
+  "headlineUnsure": "PhishGuard could not decide.",
+  "riskScore": "Risk score",
+  "checkedOn": "Checked {date}",
+  "@checkedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "checkedOnFromHistory": "Checked {date}, saved in your history",
+  "@checkedOnFromHistory": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dateAtTime": "{day}, {time}",
+  "@dateAtTime": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "whatToDo": "What to do now",
+  "noAdvice": "No particular action needed.",
+  "officialContact": "Official: {contact}",
+  "@officialContact": {
+    "placeholders": {
+      "contact": {
+        "type": "String"
+      }
+    }
+  },
+  "officialContactHint": "Opens the official contact, not a link from the message.",
+  "contactCopied": "Contact copied. Open it yourself in your browser or phone app.",
+  "copy": "Copy",
+  "why": "Why",
+  "source": "Source: {source}",
+  "@source": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "evidence": "Evidence",
+  "noEvidenceDetail": "No further detail for this reason.",
+  "showEvidence": "Show the evidence",
+  "hideEvidence": "Hide the evidence",
+  "originalMessage": "The message checked",
+  "showAll": "Show all",
+  "showLess": "Show less",
+  "tagPhone": "phone",
+  "@tagPhone": {
+    "description": "Tag replacing a hidden phone number"
+  },
+  "tagCard": "card",
+  "@tagCard": {
+    "description": "Tag replacing a hidden card number"
+  },
+  "tagAccount": "account",
+  "@tagAccount": {
+    "description": "Tag replacing a hidden account number"
+  },
+  "tagCin": "ID",
+  "@tagCin": {
+    "description": "Tag replacing a hidden national ID number"
+  },
+  "checkAnother": "Check another message",
+  "feedbackQuestion": "Was this verdict helpful?",
+  "starsLabel": "{count, plural, =1{1 star out of 5} other{{count} stars out of 5}}",
+  "@starsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentHint": "A comment? (optional)",
+  "send": "Send",
+  "reportScam": "Report as scam",
+  "reportExplain": "The checked text, without your personal numbers, will be sent to the PhishGuard team so this scam is recognised in the future.",
+  "reportWhatIsSent": "What will be sent",
+  "report": "Report",
+  "feedbackThanks": "Thanks, your feedback was sent.",
+  "reportThanks": "Thanks, your report was sent.",
+  "feedbackError": "Could not send. Try again later.",
+  "cancel": "Cancel",
+  "screenshotTitle": "Check a screenshot",
+  "screenshotIntroTitle": "Choose a screenshot of the message",
+  "screenshotIntroBody": "The text is read on your phone. The image itself is never sent.",
+  "chooseScreenshot": "Choose a screenshot",
+  "screenshotLatinOnly": "Screenshots in French or English can be read. For Arabic, paste the text instead.",
+  "screenshotPreviewLabel": "The chosen screenshot",
+  "readingImage": "Reading the text…",
+  "readingImageBody": "This happens on your phone.",
+  "textFromScreenshot": "Text read from the screenshot: check it, then start the check.",
+  "checkThisText": "Check this text",
+  "chooseAnother": "Choose another screenshot",
+  "typeInstead": "Type the message instead",
+  "noTextTitle": "No text found",
+  "noTextInImage": "No text found in this image. Arabic screenshots cannot be read yet: paste the text of the message instead.",
+  "imageErrorTitle": "This image could not be read",
+  "imageError": "Choose another screenshot, or paste the text of the message.",
+  "historyTitle": "History",
+  "searchHistory": "Search your checks",
+  "filterAll": "All {count}",
+  "@filterAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMatchTitle": "No check matches",
+  "noMatchBody": "Try another word or remove the filter.",
+  "historyEmptyTitle": "No checks yet",
+  "historyEmpty": "Your checks will appear here. They stay on this phone.",
+  "checkAMessage": "Check a message",
+  "clearHistory": "Clear history",
+  "clearHistoryQuestion": "Clear all checks saved on this phone? This cannot be undone.",
+  "clear": "Clear",
+  "historyCleared": "History cleared",
+  "historyCount": "{count, plural, =0{No check saved} =1{1 check saved on this phone} other{{count} checks saved on this phone}}",
+  "@historyCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "languageLabel": "Language",
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "themeSystem": "Phone",
+  "@themeSystem": {
+    "description": "Theme follows the phone setting"
+  },
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "textSize": "Text size",
+  "textSizePreview": "Your bank will never ask for your code by SMS.",
+  "easyRead": "Easy-read mode",
+  "easyReadBody": "Bigger text and buttons, stronger contrast, no decorative animation, reasons opened.",
+  "privacy": "Privacy",
+  "privacyInfo": "How PhishGuard protects your privacy",
+  "privacyServerNote": "The masked text is used to give the verdict. It is kept by PhishGuard only if you report the message as a scam.",
+  "about": "About",
+  "aboutPhishGuard": "About PhishGuard",
+  "versionLabel": "Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutBody": "PhishGuard gives a second opinion on SMS, emails and links, with Tunisian brands and scams in mind.",
+  "aboutRules": "Fixed rules decide the verdict; AI only explains it. A check that fails never gives “Looks safe”.",
+  "aboutTeam": "Team",
+  "aboutSchool": "SUP’COM team project, 2026/2027",
+  "aboutSupervisor": "Supervised by {name}",
+  "@aboutSupervisor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutServer": "Server",
+  "licenses": "Open-source licences"
+}

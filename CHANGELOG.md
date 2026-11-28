@@ -2,6 +2,15 @@
 
 Chaque version correspond à une étape du plan de travail et à une étiquette Git.
 
+## Non publié — Interface v2 (app)
+- Nouvelle interface Flutter : Riverpod, GoRouter, Dio, Material 3, flutter_animate, traductions ARB (FR/EN/AR, arabe de droite à gauche).
+- Thème clair et sombre, polices Readex Pro / IBM Plex Sans / Noto Sans Arabic intégrées, taille du texte, mode lecture facile.
+- Premier lancement en 4 temps : écran d'accueil, présentation, promesses de confidentialité, langue (aperçu immédiat).
+- Vérification en 4 étapes affichées ; verdicts reconnaissables à leur forme (octogone, losange, cercle) ; preuves dépliables ; contact officiel ouvrable.
+- Historique : recherche, filtres par verdict, regroupement par jour ; effacement avec confirmation.
+- Rien n'est analysé sans un appui sur « Vérifier » : un texte partagé attend dans le champ.
+- Mêmes clés de stockage que v1.0 (consentement, langue, historique) : rien n'est perdu à la mise à jour.
+
 ## v1.0 — Version finale
 - APK de production : signature avec la clé de l'équipe (`android/key.properties`), règles R8 pour ML Kit.
 - Publication automatique : pousser une étiquette `v*` construit l'APK et le met sur la page *Releases* de GitHub.
