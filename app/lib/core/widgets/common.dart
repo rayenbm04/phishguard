@@ -24,7 +24,7 @@ class SectionHeader extends StatelessWidget {
               child: Text(title, style: Theme.of(context).textTheme.titleLarge),
             ),
           ),
-          if (action != null) action!,
+          ?action,
         ],
       ),
     );
